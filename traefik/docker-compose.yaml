@@ -1,0 +1,31 @@
+version: '3.4'
+services:
+
+  traefik:
+    image: library/traefik
+    container_name: traefik
+    restart: always
+    healthcheck:
+      test: ["CMD", "/traefik", "healthcheck"]
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 5s
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./traefik.toml:/etc/traefik/traefik.toml
+      - ./ssl:/ssl
+    ports:
+      - 80:80
+      - 443:443
+    labels:
+      - traefik.enable=true
+      - traefik.frontend.rule=Host:traefik.docker
+      - traefik.port=8080
+      - traefik.docker.network=proxy
+    networks:
+      - proxy
+
+networks:
+  proxy:
+    external: true
