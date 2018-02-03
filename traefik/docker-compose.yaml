@@ -1,5 +1,9 @@
 version: '3.4'
 services:
+  pebble:
+    build: acme-server
+    networks:
+      - default
 
   traefik:
     image: library/traefik
@@ -14,6 +18,7 @@ services:
       start_period: 5s
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./ca-certificates.crt:/etc/ssl/certs/ca-certificates.crt
       - ./traefik.toml:/etc/traefik/traefik.toml
     ports:
       - 80:80
@@ -24,6 +29,9 @@ services:
       - traefik.port=8080
     networks:
       - proxy
+      - default
+    depends_on:
+      - pebble
 
 networks:
   proxy:
